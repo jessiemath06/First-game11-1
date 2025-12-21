@@ -1,0 +1,1822 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Jessie Math - 圓面積與扇形面積</title>
+
+  <!-- Fonts / Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;800&family=Noto+Sans+TC:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <style>
+    :root{
+      --ink:#0f172a; --muted:#64748b; --line:#e5e7eb;
+      --bg:#f4f6fb; --card:#ffffff; --shadow:0 12px 32px rgba(2,8,23,.10);
+      --radius:20px; --safe:16px;
+
+      --brand:#5f73ff; --brand2:#f7b3c2; --accent:#FFD700;
+      --good:#16a34a; --bad:#dc2626; --warn:#f59e0b;
+
+      --pill:#ffffff; --pillLine:#dbe4ff;
+      --glass:rgba(255,255,255,.72);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Plus Jakarta Sans","Noto Sans TC",system-ui,-apple-system,Segoe UI,Roboto,"Microsoft JhengHei",sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(14px 14px at 12% 10%, rgba(95,115,255,.18) 10%, transparent 55%),
+        radial-gradient(18px 18px at 85% 22%, rgba(247,179,194,.22) 10%, transparent 55%),
+        radial-gradient(16px 16px at 18% 80%, rgba(255,215,0,.16) 10%, transparent 55%),
+        linear-gradient(180deg, #fbfcff, #f4f6fb);
+      overflow-x:hidden;
+    }
+
+    /* ===== Topbar (像你的截圖那樣乾淨) ===== */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,.65);
+      border-bottom:1px solid rgba(226,232,240,.8);
+    }
+    .topbar-inner{
+      max-width:1100px; margin:0 auto;
+      padding:10px var(--safe);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width:220px;
+    }
+    .brand .avatar{
+      width:44px; height:44px; border-radius:999px;
+      border:3px solid var(--accent);
+      background:transparent;
+      display:grid; place-items:center;
+      overflow:hidden;
+      box-shadow: 0 10px 20px rgba(2,8,23,.10);
+      flex:0 0 auto;
+    }
+    .brand .avatar img{width:100%; height:100%; object-fit:contain; background:transparent}
+    .brand .txt{ line-height:1.05; }
+    .brand .txt .t1{
+      font-family:"Fredoka","Plus Jakarta Sans",sans-serif;
+      font-weight:800;
+      letter-spacing:.3px;
+      font-size:18px;
+    }
+    .brand .txt .t2{
+      font-size:12px; color:var(--muted); font-weight:700;
+    }
+
+    .navBtns{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
+    }
+    .iconBtn, .pillBtn{
+      border:1px solid rgba(203,213,225,.9);
+      background:rgba(255,255,255,.85);
+      border-radius:999px;
+      padding:10px 12px;
+      display:flex; align-items:center; gap:8px;
+      color:var(--ink); text-decoration:none;
+      box-shadow: 0 10px 18px rgba(2,8,23,.06);
+      transition:.15s transform ease, .15s box-shadow ease, .15s background ease;
+      font-weight:800;
+      user-select:none;
+    }
+    .iconBtn:hover,.pillBtn:hover{ transform: translateY(-1px); box-shadow:0 14px 26px rgba(2,8,23,.10); background:#fff; }
+    .iconBtn i{font-size:16px}
+    .iconBtn .label{display:inline}
+
+    /* ===== Layout ===== */
+    .wrap{ max-width:1100px; margin:0 auto; padding:18px var(--safe) 40px; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    .card{
+      background:rgba(255,255,255,.86);
+      border:1px solid rgba(226,232,240,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid rgba(226,232,240,.9);
+      background: linear-gradient(90deg, rgba(95,115,255,.10), rgba(247,179,194,.10));
+    }
+    .card .hd .title{
+      font-weight:900;
+      font-size:15px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(203,213,225,.9);
+      background:rgba(255,255,255,.9);
+      font-size:12px;
+      font-weight:900;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .card .bd{ padding:16px; }
+
+    .heroTitle{
+      font-family:"Fredoka","Noto Sans TC",sans-serif;
+      font-size:22px; font-weight:900;
+      margin:2px 0 8px;
+      letter-spacing:.3px;
+    }
+    .sub{
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.6;
+      margin:0;
+    }
+    .spark{
+      display:inline-block;
+      padding:3px 10px;
+      border-radius:999px;
+      background: rgba(255,215,0,.22);
+      border:1px solid rgba(255,215,0,.35);
+      font-weight:900;
+    }
+
+    /* ===== Screens ===== */
+    .screen{ display:none; }
+    .screen.active{ display:block; }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .col{ display:flex; flex-direction:column; gap:10px; }
+    .spacer{ height:8px; }
+
+    .input{
+      width:100%;
+      border:1px solid rgba(203,213,225,.95);
+      border-radius:14px;
+      padding:12px 12px;
+      font-size:16px;
+      font-weight:800;
+      outline:none;
+      background:rgba(255,255,255,.95);
+    }
+    .input:focus{ border-color:rgba(95,115,255,.7); box-shadow:0 0 0 4px rgba(95,115,255,.12); }
+
+    .bigBtn{
+      width:100%;
+      border:0;
+      border-radius: 16px;
+      padding:12px 14px;
+      font-weight:900;
+      font-size:15px;
+      color:#0b1224;
+      background: linear-gradient(135deg, rgba(95,115,255,.18), rgba(247,179,194,.22));
+      box-shadow: 0 14px 30px rgba(2,8,23,.10);
+      cursor:pointer;
+      transition:.15s transform ease, .15s box-shadow ease;
+    }
+    .bigBtn:hover{ transform: translateY(-1px); box-shadow:0 18px 40px rgba(2,8,23,.14); }
+    .bigBtn.primary{
+      background: linear-gradient(135deg, rgba(95,115,255,.95), rgba(247,179,194,.80));
+      color:#fff;
+    }
+    .bigBtn.ghost{
+      background: rgba(255,255,255,.88);
+      border:1px solid rgba(203,213,225,.95);
+      box-shadow: 0 10px 22px rgba(2,8,23,.08);
+      color:var(--ink);
+    }
+    .bigBtn.small{
+      width:auto;
+      padding:10px 12px;
+      border-radius:14px;
+      font-size:14px;
+    }
+
+    .chips{ display:flex; gap:10px; flex-wrap:wrap; }
+    .chip{
+      border:1px solid rgba(203,213,225,.95);
+      background: rgba(255,255,255,.90);
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+      transition:.15s transform ease, .15s box-shadow ease, .15s border-color ease;
+      display:flex; align-items:center; gap:8px;
+      min-width:160px;
+      justify-content:center;
+    }
+    .chip:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(2,8,23,.10); }
+    .chip.active{
+      border-color: rgba(95,115,255,.65);
+      box-shadow:0 0 0 4px rgba(95,115,255,.12);
+    }
+    .chip.disabled{
+      opacity:.55; cursor:not-allowed;
+      transform:none !important; box-shadow:none !important;
+    }
+
+    .help{
+      padding:12px;
+      border-radius:16px;
+      background: rgba(255,255,255,.75);
+      border:1px dashed rgba(148,163,184,.85);
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.7;
+    }
+
+    /* ===== Game HUD ===== */
+    .hud{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:12px;
+      align-items:stretch;
+    }
+    .hudBox{
+      border:1px solid rgba(226,232,240,.9);
+      border-radius:16px;
+      background: rgba(255,255,255,.86);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .hudTop{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      flex-wrap:wrap;
+    }
+    .kpiRow{ display:flex; gap:10px; flex-wrap:wrap; }
+    .kpi{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(203,213,225,.9);
+      background: rgba(255,255,255,.92);
+      font-weight:900;
+      font-size:12px;
+      display:flex; align-items:center; gap:8px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .kpi b{ color:var(--ink); }
+    .timer{
+      font-family:"Fredoka","Plus Jakarta Sans",sans-serif;
+      font-weight:900;
+      font-size:20px;
+      padding:8px 12px;
+      border-radius:16px;
+      background: rgba(255,215,0,.18);
+      border:1px solid rgba(255,215,0,.35);
+      box-shadow: 0 12px 24px rgba(2,8,23,.08);
+      display:flex; align-items:center; gap:10px;
+      white-space:nowrap;
+    }
+
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .miniBtn{
+      border:1px solid rgba(203,213,225,.95);
+      background: rgba(255,255,255,.92);
+      border-radius: 14px;
+      padding:10px 12px;
+      font-weight:900;
+      cursor:pointer;
+      display:flex; align-items:center; gap:8px;
+      transition:.15s transform ease, .15s box-shadow ease;
+      user-select:none;
+    }
+    .miniBtn:hover{ transform: translateY(-1px); box-shadow:0 14px 26px rgba(2,8,23,.10); }
+    .miniBtn.danger{ border-color: rgba(220,38,38,.35); background: rgba(220,38,38,.06); }
+    .miniBtn.brand{ border-color: rgba(95,115,255,.35); background: rgba(95,115,255,.07); }
+    .miniBtn.warn{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.06); }
+
+    /* ===== Play area ===== */
+    .playGrid{
+      display:grid;
+      grid-template-columns: 1fr .92fr;
+      gap:12px;
+      align-items:start;
+    }
+    .stage{
+      border:1px solid rgba(226,232,240,.9);
+      border-radius:18px;
+      background: rgba(255,255,255,.90);
+      padding:12px;
+      position:relative;
+      overflow:hidden;
+      min-height:360px;
+    }
+    .stage canvas{
+      width:100%;
+      height:300px;
+      display:block;
+      border-radius:16px;
+      background:
+        radial-gradient(12px 12px at 10% 20%, rgba(95,115,255,.10), transparent 60%),
+        radial-gradient(14px 14px at 90% 30%, rgba(247,179,194,.10), transparent 60%),
+        linear-gradient(180deg, rgba(244,246,251,.9), rgba(255,255,255,.9));
+      border:1px solid rgba(226,232,240,.9);
+    }
+    .stage .stageHint{
+      margin-top:10px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    }
+    .meter{
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(203,213,225,.95);
+      background: rgba(255,255,255,.95);
+      font-weight:900;
+      color:var(--muted);
+      display:flex; gap:8px; align-items:center;
+    }
+    .meter b{ color:var(--ink); }
+    .slider{
+      -webkit-appearance:none;
+      width: 220px;
+      height: 10px;
+      border-radius:999px;
+      background: rgba(95,115,255,.18);
+      outline:none;
+    }
+    .slider::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width: 22px; height: 22px;
+      border-radius:999px;
+      background: linear-gradient(135deg, rgba(95,115,255,.95), rgba(247,179,194,.85));
+      border:2px solid rgba(255,255,255,.9);
+      box-shadow: 0 10px 20px rgba(2,8,23,.16);
+      cursor:pointer;
+    }
+
+    .qa{
+      border:1px solid rgba(226,232,240,.9);
+      border-radius:18px;
+      background: rgba(255,255,255,.90);
+      padding:12px;
+    }
+    .qTitle{
+      font-weight:1000;
+      font-size:14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:8px;
+    }
+    .qText{
+      font-size:15px;
+      font-weight:900;
+      line-height:1.6;
+      margin:0 0 10px;
+    }
+    .formula{
+      font-family:"Fredoka","Plus Jakarta Sans",sans-serif;
+      font-weight:900;
+      padding:8px 10px;
+      border-radius:14px;
+      border:1px dashed rgba(95,115,255,.45);
+      background: rgba(95,115,255,.07);
+      color:#1f2a5a;
+      margin:10px 0;
+    }
+    .answerRow{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .ansInput{
+      flex:1 1 180px;
+      border:2px solid rgba(95,115,255,.35);
+      border-radius:14px;
+      padding:12px 12px;
+      font-size:16px;
+      font-weight:900;
+      outline:none;
+      background: rgba(255,255,255,.96);
+    }
+    .ansInput:focus{ border-color: rgba(95,115,255,.80); box-shadow:0 0 0 4px rgba(95,115,255,.12); }
+    .submitBtn{
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:1000;
+      cursor:pointer;
+      background: linear-gradient(135deg, rgba(95,115,255,.95), rgba(247,179,194,.80));
+      color:#fff;
+      box-shadow: 0 14px 26px rgba(2,8,23,.12);
+      display:flex; align-items:center; gap:8px;
+      transition:.15s transform ease, .15s box-shadow ease;
+    }
+    .submitBtn:hover{ transform: translateY(-1px); box-shadow: 0 18px 36px rgba(2,8,23,.16); }
+    .feedback{
+      margin-top:10px;
+      border-radius:16px;
+      padding:10px 12px;
+      font-weight:1000;
+      display:none;
+      line-height:1.6;
+    }
+    .feedback.ok{ background: rgba(22,163,74,.10); border:1px solid rgba(22,163,74,.25); color:#0b3a1d; }
+    .feedback.no{ background: rgba(220,38,38,.10); border:1px solid rgba(220,38,38,.25); color:#3a0b0b; }
+    .feedback.show{ display:block; }
+
+    /* ===== Scenario card (Level 3) ===== */
+    .sceneCard{
+      border-radius:18px;
+      border:1px solid rgba(226,232,240,.9);
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.86));
+      overflow:hidden;
+      margin-bottom:10px;
+    }
+    .sceneTop{
+      padding:10px 12px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(226,232,240,.9);
+      background: rgba(255,215,0,.10);
+      font-weight:1000;
+    }
+    .sceneBody{ padding:10px 12px; }
+    .sceneSvg{
+      width:100%;
+      height:160px;
+      display:block;
+      border-radius:14px;
+      border:1px solid rgba(226,232,240,.9);
+      background: radial-gradient(18px 18px at 20% 30%, rgba(95,115,255,.10), transparent 65%),
+                  radial-gradient(18px 18px at 80% 50%, rgba(247,179,194,.12), transparent 65%),
+                  linear-gradient(180deg, rgba(244,246,251,.8), rgba(255,255,255,.9));
+    }
+
+    /* ===== Pause overlay ===== */
+    .overlay{
+      position:fixed; inset:0; z-index:200;
+      display:none;
+      background: rgba(15,23,42,.55);
+      backdrop-filter: blur(6px);
+      align-items:center; justify-content:center;
+      padding:18px;
+    }
+    .overlay.show{ display:flex; }
+    .overlay .panel{
+      width:min(520px, 100%);
+      border-radius:22px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(226,232,240,.9);
+      box-shadow: 0 30px 80px rgba(2,8,23,.35);
+      overflow:hidden;
+    }
+    .overlay .panel .phd{
+      padding:14px 16px;
+      border-bottom:1px solid rgba(226,232,240,.9);
+      font-weight:1000;
+      display:flex; align-items:center; justify-content:space-between;
+      background: linear-gradient(90deg, rgba(95,115,255,.10), rgba(247,179,194,.10));
+    }
+    .overlay .panel .pbd{ padding:16px; }
+    .overlay .panel .pbd p{ margin:0 0 10px; color:var(--muted); font-weight:800; line-height:1.7; }
+    .overlay .panel .pbd .row{ justify-content:flex-end; }
+
+    /* ===== Leaderboard (內嵌在主選單) ===== */
+    .lbWrap{ display:flex; flex-direction:column; gap:10px; }
+    .lbItem{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 12px;
+      border:1px solid rgba(226,232,240,.9);
+      border-radius:16px;
+      background: rgba(255,255,255,.92);
+      font-weight:900;
+    }
+    .lbItem .left{ display:flex; align-items:center; gap:10px; }
+    .rank{
+      width:30px; height:30px;
+      display:grid; place-items:center;
+      border-radius:10px;
+      background: rgba(95,115,255,.10);
+      border:1px solid rgba(95,115,255,.18);
+      font-family:"Fredoka";
+    }
+    .tiny{
+      color:var(--muted);
+      font-weight:900;
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    /* ===== Mobile ===== */
+    @media (max-width: 920px){
+      .playGrid{ grid-template-columns: 1fr; }
+      .hud{ grid-template-columns: 1fr; }
+      .iconBtn .label{ display:none; }
+      .brand{ min-width:auto; }
+    }
+    @media (max-width: 480px){
+      .topbar-inner{ padding:10px 12px; }
+      .wrap{ padding:14px 12px 34px; }
+      .brand .txt .t1{ font-size:16px; }
+      .slider{ width: 100%; }
+      .timer{ font-size:18px; }
+      .chip{ min-width: 148px; }
+    }
+
+    .pop{ animation: pop .28s ease both; }
+    @keyframes pop{
+      0%{ transform:scale(.94); opacity:.5; }
+      100%{ transform:scale(1); opacity:1; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ===== Topbar ===== -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="avatar" title="Jessie Math">
+          <img src="JESSIEMATH-Q.png" alt="JessieMath Avatar" />
+        </div>
+        <div class="txt">
+          <div class="t1">Jessie Math</div>
+          <div class="t2">主題十一｜圓面積 × 扇形面積</div>
+        </div>
+      </div>
+
+      <div class="navBtns">
+        <a class="iconBtn" href="https://jessiemath0703-chu.github.io/website2/" target="_blank" rel="noopener">
+          <i class="fa-solid fa-house"></i><span class="label">首頁</span>
+        </a>
+        <a class="iconBtn" href="https://jessiemath0703-chu.github.io/Game-Lobby/" target="_blank" rel="noopener">
+          <i class="fa-solid fa-gamepad"></i><span class="label">遊戲大廳</span>
+        </a>
+        <a class="pillBtn" id="btnTopBackTopic" href="https://jessiemath0703-chu.github.io/Game-Lobby/#g6-u11" target="_blank" rel="noopener">
+          <i class="fa-solid fa-layer-group"></i><span>六年級園面積與扇形面積</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- Main card (only game flow) -->
+      <div class="card">
+        <div class="hd">
+          <div class="title">
+            <i class="fa-solid fa-circle-nodes"></i>
+            <span id="mainTitle">圓與扇形：把面積切成剛剛好</span>
+          </div>
+          <div class="badge" id="whoBadge"><i class="fa-solid fa-user"></i> 尚未登入</div>
+        </div>
+
+        <div class="bd">
+          <!-- ===== Screen 1: Name + Rules ===== -->
+          <section class="screen active" id="screen-name">
+            <div class="heroTitle">先報上名號，宇宙才肯記住你 ✨</div>
+            <p class="sub">
+              這是一款 <span class="spark">60 秒衝刺</span> 的三關整合遊戲。<br/>
+              答對 +5 秒、答錯 -5 秒，Combo 會把分數往天花板送（真的會）。
+            </p>
+
+            <div class="spacer"></div>
+
+            <div class="col">
+              <label style="font-weight:1000;color:var(--muted)">你的名字（必填）</label>
+              <input id="nameInput" class="input" maxlength="16" placeholder="例如：捷析老師 / Jessie / 小宇宙" />
+              <button class="bigBtn primary" id="btnNameGo">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> 進入主選單
+              </button>
+
+              <div class="help">
+                <div style="font-weight:1000;color:var(--ink);margin-bottom:6px">
+                  <i class="fa-solid fa-stopwatch"></i> 規則一眼懂
+                </div>
+                • 每回合預設 <b>60 秒</b>，題目連發，讓你腦袋一直在跳舞<br/>
+                • 答對：<b style="color:var(--good)">+5 秒</b>＋分數＋Combo 續命<br/>
+                • 答錯：<b style="color:var(--bad)">-5 秒</b>＋Combo 歸零（心碎但科學）<br/>
+                • 遊戲中會有：<b>暫停 / 重來 / 回主選單</b> 三顆大按鈕<br/>
+                • 公式提示：本遊戲預設 <b>π = 3.14</b>（考試常用那種）
+              </div>
+
+              <div class="help" style="border-style:solid">
+                <div style="font-weight:1000;color:var(--ink);margin-bottom:6px">
+                  快捷鍵（桌機）
+                </div>
+                Enter：送出答案　｜　Space：暫停/繼續　｜　R：重來
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Screen 2: Menu ===== -->
+          <section class="screen" id="screen-menu">
+            <div class="heroTitle">主選單：挑一關，挑一個節奏，然後開打</div>
+            <p class="sub">排行榜會依「關卡 × 難度 × 速度」分開記錄（每種節奏都能刷高分）。</p>
+
+            <div class="spacer"></div>
+
+            <div class="help" id="menuHint">
+              <b>步驟：</b>先選關卡 → 再選難度 → 再選速度 → 你就可以按「開始本局」。
+            </div>
+
+            <div class="spacer"></div>
+
+            <div style="font-weight:1000;margin-bottom:8px"><i class="fa-solid fa-map"></i> 選關卡</div>
+            <div class="chips" id="levelChips">
+              <div class="chip" data-level="1"><i class="fa-solid fa-circle"></i> 第一關：圓面積</div>
+              <div class="chip" data-level="2"><i class="fa-solid fa-chart-pie"></i> 第二關：扇形面積</div>
+              <div class="chip" data-level="3"><i class="fa-solid fa-box-open"></i> 第三關：生活應用</div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div style="font-weight:1000;margin-bottom:8px"><i class="fa-solid fa-signal"></i> 選難度</div>
+            <div class="chips" id="diffChips">
+              <div class="chip" data-diff="easy"><i class="fa-solid fa-leaf"></i> 簡單（穩穩）</div>
+              <div class="chip" data-diff="normal"><i class="fa-solid fa-fire"></i> 普通（剛剛好痛）</div>
+              <div class="chip" data-diff="hard"><i class="fa-solid fa-bolt"></i> 困難（漂亮地燃燒）</div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div style="font-weight:1000;margin-bottom:8px"><i class="fa-solid fa-gauge-high"></i> 選速度</div>
+            <div class="chips" id="speedChips">
+              <div class="chip" data-speed="slow"><i class="fa-solid fa-feather"></i> 慢速（從容）</div>
+              <div class="chip" data-speed="normal"><i class="fa-solid fa-drum"></i> 標準（剛好）</div>
+              <div class="chip" data-speed="fast"><i class="fa-solid fa-rocket"></i> 高速（腦內飆車）</div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="row">
+              <button class="bigBtn primary" id="btnStart" disabled style="opacity:.55;cursor:not-allowed">
+                <i class="fa-solid fa-play"></i> 開始本局
+              </button>
+              <button class="bigBtn ghost" id="btnClearLB">
+                <i class="fa-solid fa-trash-can"></i> 清空目前榜（本機）
+              </button>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="help" id="selectedSummary">
+              <b>目前選擇：</b>（尚未完成）
+            </div>
+
+            <div class="spacer"></div>
+
+            <div style="font-weight:1000;margin-bottom:8px"><i class="fa-solid fa-trophy"></i> 排行榜（Top 5）</div>
+            <div class="lbWrap" id="lbList"></div>
+
+            <div class="spacer"></div>
+            <div class="help">
+              <b>備註：</b>排行榜儲存在你的瀏覽器（localStorage）。換裝置就像換宇宙，榜單也會重新長出來。
+            </div>
+          </section>
+
+          <!-- ===== Screen: Game ===== -->
+          <section class="screen" id="screen-game">
+            <div class="hud">
+              <div class="hudBox">
+                <div class="hudTop">
+                  <div class="badge" id="modeBadge"><i class="fa-solid fa-flag-checkered"></i> 關卡 - 難度 - 速度</div>
+                  <div class="timer" id="timerBox"><i class="fa-solid fa-hourglass-half"></i> <span id="timerText">60</span>s</div>
+                </div>
+
+                <div class="kpiRow">
+                  <div class="kpi"><i class="fa-solid fa-star"></i> 分數：<b id="scoreText">0</b></div>
+                  <div class="kpi"><i class="fa-solid fa-bolt"></i> Combo：<b id="comboText">0</b></div>
+                  <div class="kpi"><i class="fa-solid fa-check"></i> 答對：<b id="correctText">0</b></div>
+                  <div class="kpi"><i class="fa-solid fa-xmark"></i> 答錯：<b id="wrongText">0</b></div>
+                </div>
+
+                <div class="actions">
+                  <button class="miniBtn brand" id="btnRestart"><i class="fa-solid fa-rotate-right"></i> 重來</button>
+                  <button class="miniBtn warn" id="btnPause"><i class="fa-solid fa-pause"></i> 暫停</button>
+                  <button class="miniBtn danger" id="btnBackMenu"><i class="fa-solid fa-door-open"></i> 回主選單</button>
+                </div>
+              </div>
+
+              <div class="hudBox">
+                <div style="font-weight:1000">本關提示</div>
+                <div class="help" id="levelTip" style="margin:0">
+                  （提示會依關卡變化）
+                </div>
+              </div>
+            </div>
+
+            <div class="spacer"></div>
+
+            <div class="playGrid">
+              <div class="stage">
+                <canvas id="viz" width="900" height="520" aria-label="互動畫布"></canvas>
+
+                <div class="stageHint">
+                  <div class="meter" id="meterA">
+                    <i class="fa-solid fa-ruler"></i> 量測：<span id="meterText">—</span>
+                  </div>
+                  <input id="slider" class="slider" type="range" min="10" max="160" value="80" />
+                </div>
+              </div>
+
+              <div class="qa">
+                <div class="qTitle">
+                  <div><i class="fa-solid fa-pen-to-square"></i> 作答區</div>
+                  <div class="badge" id="piBadge">π = 3.14</div>
+                </div>
+
+                <div class="sceneCard" id="sceneCard" style="display:none">
+                  <div class="sceneTop">
+                    <span id="sceneTitle"><i class="fa-solid fa-image"></i> 情境插圖卡</span>
+                    <span class="badge" id="sceneTag">生活題</span>
+                  </div>
+                  <div class="sceneBody">
+                    <svg class="sceneSvg" id="sceneSvg" viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" aria-label="情境插圖"></svg>
+                  </div>
+                </div>
+
+                <p class="qText" id="qText">題目載入中…</p>
+
+                <div class="formula" id="formulaBox">
+                  公式：A = πr²　｜　扇形面積 = 圓面積 × (中心角 / 360°)
+                </div>
+
+                <div class="answerRow">
+                  <input id="ansInput" class="ansInput" inputmode="decimal" placeholder="請在這裡輸入答案（可小數）" />
+                  <button class="submitBtn" id="btnSubmit"><i class="fa-solid fa-paper-plane"></i> 送出</button>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+
+                <div class="spacer"></div>
+                <div class="help">
+                  <b>小提示：</b>可輸入小數；判定採「允許誤差」方式（依難度調整）。<br/>
+                  想更準？先用左邊互動量測，再下筆。
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ===== Screen: Result ===== -->
+          <section class="screen" id="screen-result">
+            <div class="heroTitle">本局結束：你把面積切得很有節奏</div>
+            <div class="help" id="resultSummary" style="margin-top:10px"></div>
+
+            <div class="spacer"></div>
+
+            <div class="row">
+              <button class="bigBtn ghost small" id="btnResultMenu">
+                <i class="fa-solid fa-layer-group"></i> 回主選單
+              </button>
+              <button class="bigBtn primary small" id="btnResultAgain">
+                <i class="fa-solid fa-rotate-right"></i> 同設定再玩
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pause Overlay -->
+  <div class="overlay" id="pauseOverlay" aria-hidden="true">
+    <div class="panel">
+      <div class="phd">
+        <div><i class="fa-solid fa-pause"></i> 暫停中</div>
+        <button class="miniBtn" id="btnOverlayClose"><i class="fa-solid fa-play"></i> 繼續</button>
+      </div>
+      <div class="pbd">
+        <p>時間已停止、題目已鎖住。深呼吸三下，再把面積切得更漂亮。</p>
+        <div class="row">
+          <button class="miniBtn brand" id="btnOverlayResume"><i class="fa-solid fa-play"></i> 繼續</button>
+          <button class="miniBtn danger" id="btnOverlayMenu"><i class="fa-solid fa-door-open"></i> 回主選單</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /**********************
+     * Jessie Math - Topic 11
+     * Single-file game
+     **********************/
+
+    // ===== Utilities =====
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    const rnd = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const fmt = (x) => {
+      const s = (Math.round(x * 100) / 100).toFixed(2);
+      return s.replace(/\.00$/,'').replace(/(\.\d)0$/,'$1');
+    };
+
+    // ===== DOM =====
+    const screens = {
+      name: $("#screen-name"),
+      menu: $("#screen-menu"),
+      game: $("#screen-game"),
+      result: $("#screen-result"),
+    };
+    const mainTitle = $("#mainTitle");
+    const whoBadge = $("#whoBadge");
+
+    const nameInput = $("#nameInput");
+    const btnNameGo = $("#btnNameGo");
+
+    const menuHint = $("#menuHint");
+    const selectedSummary = $("#selectedSummary");
+    const btnStart = $("#btnStart");
+    const btnClearLB = $("#btnClearLB");
+
+    const levelChips = $$("#levelChips .chip");
+    const diffChips = $$("#diffChips .chip");
+    const speedChips = $$("#speedChips .chip");
+
+    const modeBadge = $("#modeBadge");
+    const timerText = $("#timerText");
+    const scoreText = $("#scoreText");
+    const comboText = $("#comboText");
+    const correctText = $("#correctText");
+    const wrongText = $("#wrongText");
+    const levelTip = $("#levelTip");
+
+    const btnRestart = $("#btnRestart");
+    const btnPause = $("#btnPause");
+    const btnBackMenu = $("#btnBackMenu");
+
+    const viz = $("#viz");
+    const ctx = viz.getContext("2d");
+    const slider = $("#slider");
+    const meterText = $("#meterText");
+
+    const qText = $("#qText");
+    const formulaBox = $("#formulaBox");
+    const ansInput = $("#ansInput");
+    const btnSubmit = $("#btnSubmit");
+    const feedback = $("#feedback");
+
+    const sceneCard = $("#sceneCard");
+    const sceneTitle = $("#sceneTitle");
+    const sceneTag = $("#sceneTag");
+    const sceneSvg = $("#sceneSvg");
+
+    const pauseOverlay = $("#pauseOverlay");
+    const btnOverlayClose = $("#btnOverlayClose");
+    const btnOverlayResume = $("#btnOverlayResume");
+    const btnOverlayMenu = $("#btnOverlayMenu");
+
+    const resultSummary = $("#resultSummary");
+    const btnResultMenu = $("#btnResultMenu");
+    const btnResultAgain = $("#btnResultAgain");
+
+    const lbList = $("#lbList");
+
+    // ===== Game State =====
+    const PI = 3.14;
+
+    const LEVELS = {
+      1: { name: "第一關：圓面積", icon:"fa-circle" },
+      2: { name: "第二關：扇形面積", icon:"fa-chart-pie" },
+      3: { name: "第三關：生活應用", icon:"fa-box-open" },
+    };
+
+    const DIFFS = {
+      easy:   { name:"簡單",   tol: 0.10, rMin: 3, rMax: 12, angleSet:[60,90,120,180], appScale: "small" },
+      normal: { name:"普通",   tol: 0.07, rMin: 5, rMax: 18, angleSet:[30,45,60,90,120,150,180,210,240,270,300], appScale:"mid" },
+      hard:   { name:"困難",   tol: 0.05, rMin: 7, rMax: 26, angleSet:[15,25,35,40,50,70,80,100,110,130,140,160,200,220,250,280,320,340], appScale:"big" },
+    };
+
+    // 速度：影響「時間流逝速度」（tick 間隔）
+    const SPEEDS = {
+      slow:   { name:"慢速",   tickMs: 1150 },
+      normal: { name:"標準",   tickMs: 1000 },
+      fast:   { name:"高速",   tickMs: 850  },
+    };
+
+    let playerName = "";
+    let selectedLevel = null;
+    let selectedDiff = null;
+    let selectedSpeed = null;
+
+    let running = false;
+    let paused = false;
+    let timeLeft = 60;
+    let score = 0;
+    let combo = 0;
+    let correct = 0;
+    let wrong = 0;
+
+    let tickHandle = null;
+    let currentQ = null;
+    let allowSubmit = true;
+    let wroteLeaderboard = false;
+
+    // Interact variables
+    let vizMode = "circle"; // circle / sector / app
+    let vizRadius = 10;     // logical radius (cm)
+    let vizAngle = 120;     // degrees
+    let vizParts = 12;      // slices
+    let appVariant = 1;
+
+    // ===== Screen helpers =====
+    function showScreen(key){
+      Object.values(screens).forEach(s => s.classList.remove("active"));
+      screens[key].classList.add("active");
+      const t = {
+        name: "圓與扇形：把面積切成剛剛好",
+        menu: "主選單",
+        game: "開始挑戰",
+        result: "本局結算",
+      }[key] || "Jessie Math";
+      mainTitle.textContent = t;
+    }
+
+    function setWho(){
+      whoBadge.innerHTML = `<i class="fa-solid fa-user"></i> ${playerName ? playerName : "尚未登入"}`;
+    }
+
+    // ===== Leaderboard =====
+    function lbKey(level, diff, speed){ return `JM_T11_L${level}_${diff}_${speed}`; }
+
+    function loadLB(level, diff, speed){
+      try{
+        const raw = localStorage.getItem(lbKey(level,diff,speed));
+        return raw ? JSON.parse(raw) : [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    function saveLB(level, diff, speed, arr){
+      localStorage.setItem(lbKey(level,diff,speed), JSON.stringify(arr));
+    }
+
+    function writeLBIfEligible(){
+      if(wroteLeaderboard) return;
+      const entry = {
+        name: playerName,
+        score,
+        correct,
+        wrong,
+        comboMax: currentSessionMaxCombo,
+        at: Date.now()
+      };
+      const arr = loadLB(selectedLevel, selectedDiff, selectedSpeed);
+      arr.push(entry);
+      arr.sort((a,b)=> b.score - a.score || a.at - b.at);
+      saveLB(selectedLevel, selectedDiff, selectedSpeed, arr.slice(0, 10));
+      wroteLeaderboard = true;
+    }
+
+    function renderMenuLB(){
+      lbList.innerHTML = "";
+      if(!selectedLevel || !selectedDiff || !selectedSpeed){
+        lbList.innerHTML = `<div class="help">先選好「關卡 × 難度 × 速度」，榜單才知道要亮哪一盞燈。</div>`;
+        return;
+      }
+      const arr = loadLB(selectedLevel, selectedDiff, selectedSpeed);
+      if(arr.length === 0){
+        lbList.innerHTML = `<div class="help">目前還沒有紀錄。去打一局，讓榜單先長出第一筆分數。</div>`;
+        return;
+      }
+      arr.slice(0,5).forEach((it, idx) => {
+        const d = new Date(it.at);
+        const stamp = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")}`;
+        const node = document.createElement("div");
+        node.className = "lbItem";
+        node.innerHTML = `
+          <div class="left">
+            <div class="rank">${idx+1}</div>
+            <div>
+              <div style="font-weight:1000">${it.name}</div>
+              <div class="tiny">答對 ${it.correct}｜答錯 ${it.wrong}｜最高 Combo ${it.comboMax}｜${stamp}</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:Fredoka;font-weight:1000;font-size:18px">${it.score}</div>
+          </div>
+        `;
+        lbList.appendChild(node);
+      });
+    }
+
+    function refreshMenuUI(){
+      const ok = !!(selectedLevel && selectedDiff && selectedSpeed);
+      btnStart.disabled = !ok;
+      btnStart.style.opacity = ok ? 1 : .55;
+      btnStart.style.cursor = ok ? "pointer" : "not-allowed";
+
+      const L = selectedLevel ? LEVELS[selectedLevel].name : "（未選）";
+      const D = selectedDiff ? DIFFS[selectedDiff].name : "（未選）";
+      const S = selectedSpeed ? SPEEDS[selectedSpeed].name : "（未選）";
+
+      selectedSummary.innerHTML = `<b>目前選擇：</b>${L}｜${D}｜${S}<br/><span style="color:var(--muted);font-weight:900">（榜單也會跟著你的選擇切換）</span>`;
+      renderMenuLB();
+
+      if(!playerName){
+        menuHint.innerHTML = `<b>提醒：</b>你還沒登入名字，先回上頁輸入，榜單才會記得你。`;
+      }else{
+        menuHint.innerHTML = `<b>步驟：</b>先選關卡 → 再選難度 → 再選速度 → 然後按「開始本局」。`;
+      }
+    }
+
+    // ===== Game engine =====
+    let currentSessionMaxCombo = 0;
+
+    function resetRunState(){
+      timeLeft = 60;
+      score = 0;
+      combo = 0;
+      correct = 0;
+      wrong = 0;
+      currentSessionMaxCombo = 0;
+      wroteLeaderboard = false;
+
+      updateHUD();
+      feedback.className = "feedback";
+      feedback.textContent = "";
+      allowSubmit = true;
+      ansInput.value = "";
+      ansInput.focus();
+    }
+
+    function updateHUD(){
+      timerText.textContent = String(timeLeft);
+      scoreText.textContent = String(score);
+      comboText.textContent = String(combo);
+      correctText.textContent = String(correct);
+      wrongText.textContent = String(wrong);
+
+      const t = timeLeft;
+      const box = $("#timerBox");
+      box.classList.remove("pop");
+      if(t <= 10){ box.style.background = "rgba(220,38,38,.14)"; box.style.borderColor = "rgba(220,38,38,.30)"; }
+      else if(t <= 25){ box.style.background = "rgba(245,158,11,.14)"; box.style.borderColor = "rgba(245,158,11,.30)"; }
+      else { box.style.background = "rgba(255,215,0,.18)"; box.style.borderColor = "rgba(255,215,0,.35)"; }
+    }
+
+    function startGame(){
+      if(!(selectedLevel && selectedDiff && selectedSpeed)) return;
+
+      resetRunState();
+      running = true;
+      paused = false;
+      pauseOverlay.classList.remove("show");
+
+      modeBadge.innerHTML = `<i class="fa-solid fa-flag-checkered"></i> ${LEVELS[selectedLevel].name}｜${DIFFS[selectedDiff].name}｜${SPEEDS[selectedSpeed].name}`;
+      setLevelTip();
+
+      // slider defaults by level
+      if(selectedLevel === 1){
+        slider.min = 20; slider.max = 170; slider.value = 90;
+      }else if(selectedLevel === 2){
+        slider.min = 15; slider.max = 345; slider.value = 120;
+      }else{
+        slider.min = 20; slider.max = 170; slider.value = 90;
+      }
+
+      showScreen("game");
+      newQuestion();
+
+      // start timer (speed)
+      if(tickHandle) clearInterval(tickHandle);
+      const tickMs = SPEEDS[selectedSpeed].tickMs;
+
+      tickHandle = setInterval(()=>{
+        if(!running || paused) return;
+        timeLeft -= 1;
+        timeLeft = clamp(timeLeft, 0, 999);
+
+        $("#timerBox").classList.add("pop");
+        setTimeout(()=>$("#timerBox").classList.remove("pop"), 140);
+
+        updateHUD();
+
+        if(timeLeft <= 0){
+          endGame(true);
+        }
+      }, tickMs);
+
+      draw();
+      ansInput.focus();
+    }
+
+    function endGame(naturalEnd){
+      running = false;
+      paused = false;
+      if(tickHandle) clearInterval(tickHandle);
+
+      if(naturalEnd) writeLBIfEligible();
+
+      const vibe =
+        (score >= 180) ? "狠。你把面積當節拍器在打。" :
+        (score >= 120) ? "很可以，節奏穩、下筆準。" :
+        (score >= 70)  ? "穩穩熱身完成，下一局就開加速。" :
+                         "今天先把手感找回來，下一局你會更兇。";
+
+      resultSummary.innerHTML = `
+        <div style="font-weight:1000;color:var(--ink);margin-bottom:8px">
+          ${LEVELS[selectedLevel].name}｜${DIFFS[selectedDiff].name}｜${SPEEDS[selectedSpeed].name}
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
+          <div class="kpi"><i class="fa-solid fa-star"></i> 分數：<b>${score}</b></div>
+          <div class="kpi"><i class="fa-solid fa-bolt"></i> 最高 Combo：<b>${currentSessionMaxCombo}</b></div>
+          <div class="kpi"><i class="fa-solid fa-check"></i> 答對：<b>${correct}</b></div>
+          <div class="kpi"><i class="fa-solid fa-xmark"></i> 答錯：<b>${wrong}</b></div>
+        </div>
+        <div style="color:var(--muted);font-weight:900;line-height:1.7;margin-top:6px">
+          ${vibe}
+        </div>
+      `;
+      showScreen("result");
+    }
+
+    function setLevelTip(){
+      if(selectedLevel === 1){
+        levelTip.innerHTML = `
+          <b>第一關｜圓面積</b><br/>
+          推拉半徑量測 r，再用 <b>A = πr²</b> 出手。<br/>
+          連續答對會疊 Combo 倍率，別讓它斷。
+        `;
+      }else if(selectedLevel === 2){
+        levelTip.innerHTML = `
+          <b>第二關｜扇形面積</b><br/>
+          推拉中心角 θ，記得 <b>扇形面積 = 圓面積 × (θ/360°)</b>。<br/>
+          你看到的不是角度，是「比例」本人。
+        `;
+      }else{
+        levelTip.innerHTML = `
+          <b>第三關｜生活應用</b><br/>
+          會出現糖果盒 / 扇形紙片 / 分割圖形等情境插圖卡。<br/>
+          先看清楚「求哪一塊」，再把公式切進去。
+        `;
+      }
+    }
+
+    function addTime(delta){
+      timeLeft = clamp(timeLeft + delta, 0, 999);
+      updateHUD();
+    }
+
+    function scoreAdd(base){
+      const mul = 1 + Math.floor(combo / 3);
+      score += base * mul;
+      updateHUD();
+    }
+
+    function showFeedback(ok, msg){
+      feedback.className = "feedback show " + (ok ? "ok" : "no");
+      feedback.innerHTML = msg;
+      feedback.scrollIntoView({block:"nearest", behavior:"smooth"});
+      setTimeout(()=>{
+        if(!running) return;
+        feedback.classList.remove("show");
+      }, 900);
+    }
+
+    // ===== Question generation =====
+    function newQuestion(){
+      allowSubmit = true;
+      ansInput.value = "";
+      feedback.className = "feedback";
+      feedback.textContent = "";
+
+      const diff = DIFFS[selectedDiff];
+
+      if(selectedLevel === 1){
+        const r = rnd(diff.rMin, diff.rMax);
+        vizMode = "circle";
+        vizRadius = r;
+        vizAngle = 360;
+        vizParts = (selectedDiff === "easy") ? 10 : (selectedDiff === "normal" ? 14 : 18);
+
+        slider.value = clamp(Math.round(r * 6), +slider.min, +slider.max);
+        updateMeter();
+
+        const area = PI * r * r;
+        currentQ = {
+          type: "circle",
+          r,
+          answer: area,
+          prompt: `已知圓的半徑 <b>r = ${r} cm</b>（可用左側推拉確認），求圓面積 A（cm²）。<br/><span style="color:var(--muted);font-weight:900">（π 取 3.14）</span>`
+        };
+
+        sceneCard.style.display = "none";
+        formulaBox.innerHTML = `公式：<b>A = πr²</b>　（π = 3.14）`;
+        qText.innerHTML = currentQ.prompt;
+
+      }else if(selectedLevel === 2){
+        const r = rnd(diff.rMin, diff.rMax);
+        const angle = pick(diff.angleSet);
+        vizMode = "sector";
+        vizRadius = r;
+        vizAngle = angle;
+        vizParts = (selectedDiff === "easy") ? 8 : (selectedDiff === "normal" ? 12 : 18);
+
+        slider.value = angle;
+        updateMeter();
+
+        const circleArea = PI * r * r;
+        const sectorArea = circleArea * (angle / 360);
+        currentQ = {
+          type: "sector",
+          r, angle,
+          answer: sectorArea,
+          prompt: `扇形的半徑 <b>r = ${r} cm</b>，中心角 <b>${angle}°</b>（可推拉角度確認），求扇形面積（cm²）。<br/><span style="color:var(--muted);font-weight:900">（π 取 3.14）</span>`
+        };
+
+        sceneCard.style.display = "none";
+        formulaBox.innerHTML = `公式：<b>扇形面積 = 圓面積 × (中心角/360°)</b>　｜　圓面積 <b>A = πr²</b>`;
+        qText.innerHTML = currentQ.prompt;
+
+      }else{
+        vizMode = "app";
+        const r = rnd(diff.rMin, diff.rMax);
+        const angle = pick(diff.angleSet);
+        const n = pick([4,6,8,10,12]);
+
+        appVariant = rnd(1,3);
+        let prompt, answer, title, tag;
+
+        if(appVariant === 1){
+          title = "糖果盒｜等分扇形";
+          tag = "糖果盒";
+          const eachAngle = 360 / n;
+          const circleArea = PI * r * r;
+          const eachArea = circleArea / n;
+          prompt = `一個圓形糖果盒半徑 <b>${r} cm</b>，被平均分成 <b>${n}</b> 格（等分扇形）。<br/>求「<b>每一格</b>」的面積（cm²）。<br/><span style="color:var(--muted);font-weight:900">（每格中心角 = ${fmt(eachAngle)}°，π 取 3.14）</span>`;
+          answer = eachArea;
+          renderSceneCandy(r, n);
+
+          vizRadius = r; vizAngle = 360; vizParts = n;
+
+        }else if(appVariant === 2){
+          title = "扇形紙片｜剪下的那一塊";
+          tag = "紙片";
+          const circleArea = PI * r * r;
+          const cutArea = circleArea * (angle / 360);
+          const remainArea = circleArea - cutArea;
+          prompt = `有一張半徑 <b>${r} cm</b> 的圓形紙。剪下中心角 <b>${angle}°</b> 的扇形做成紙片。<br/>求「<b>剩下的面積</b>」是多少（cm²）？<br/><span style="color:var(--muted);font-weight:900">（π 取 3.14）</span>`;
+          answer = remainArea;
+          renderScenePaper(r, angle);
+
+          vizRadius = r; vizAngle = angle; vizParts = (selectedDiff==="easy"?8:12);
+
+        }else{
+          title = "分割圖形｜雙扇形拼接";
+          tag = "拼接";
+          const angle2 = pick(diff.angleSet);
+          const circleArea = PI * r * r;
+          const a1 = circleArea * (angle / 360);
+          const a2 = circleArea * (angle2 / 360);
+          prompt = `同一個半徑 <b>${r} cm</b> 的圓，取出兩個扇形：<b>${angle}°</b> 與 <b>${angle2}°</b>，拼成圖案。<br/>求「<b>兩個扇形面積總和</b>」（cm²）。<br/><span style="color:var(--muted);font-weight:900">（π 取 3.14）</span>`;
+          answer = a1 + a2;
+          renderSceneSplit(r, angle, angle2);
+
+          vizRadius = r; vizAngle = angle; vizParts = 18;
+        }
+
+        currentQ = { type:"app", r, angle, n, answer, prompt, title, tag };
+
+        sceneCard.style.display = "block";
+        sceneTitle.innerHTML = `<i class="fa-solid fa-image"></i> 情境插圖卡：${title}`;
+        sceneTag.textContent = tag;
+
+        formulaBox.innerHTML = `公式：<b>A = πr²</b>　｜　<b>扇形面積 = 圓面積 × (中心角/360°)</b>　（π = 3.14）`;
+        qText.innerHTML = prompt;
+
+        slider.value = clamp(Math.round(r * 6), +slider.min, +slider.max);
+        updateMeter();
+      }
+
+      draw();
+    }
+
+    // ===== Answer check =====
+    function parseAns(){
+      const raw = ansInput.value.trim().replace(/，/g,",");
+      if(!raw) return null;
+      if(raw.includes("/")){
+        const [a,b] = raw.split("/").map(x=>x.trim());
+        const na = Number(a), nb = Number(b);
+        if(Number.isFinite(na) && Number.isFinite(nb) && nb !== 0) return na/nb;
+      }
+      const v = Number(raw);
+      if(!Number.isFinite(v)) return null;
+      return v;
+    }
+
+    function withinTol(given, target, tol){
+      const denom = Math.max(1, Math.abs(target));
+      const rel = Math.abs(given - target) / denom;
+      return rel <= tol;
+    }
+
+    function onSubmit(){
+      if(!running || paused) return;
+      if(!allowSubmit) return;
+
+      const val = parseAns();
+      if(val === null){
+        showFeedback(false, `請輸入有效數字（可小數）。例如：<b>78.5</b> 或 <b>314</b>。`);
+        ansInput.focus();
+        return;
+      }
+
+      allowSubmit = false;
+
+      const diff = DIFFS[selectedDiff];
+      const target = currentQ.answer;
+      const ok = withinTol(val, target, diff.tol);
+
+      if(ok){
+        correct += 1;
+        combo += 1;
+        currentSessionMaxCombo = Math.max(currentSessionMaxCombo, combo);
+
+        addTime(+5);
+
+        const base = (selectedDiff==="easy") ? 10 : (selectedDiff==="normal" ? 12 : 14);
+        const lvlBonus = (selectedLevel===3) ? 2 : 0;
+        scoreAdd(base + lvlBonus);
+
+        showFeedback(true,
+          `✅ 正確！<br/>你的答案：<b>${fmt(val)}</b>　｜　正確答案：約 <b>${fmt(target)}</b>（允許誤差判定）<br/>
+           <span style="color:var(--muted);font-weight:900">+5 秒｜Combo <b>${combo}</b></span>`
+        );
+
+      }else{
+        wrong += 1;
+        combo = 0;
+        addTime(-5);
+
+        showFeedback(false,
+          `❌ 再接近一點就中了。<br/>你的答案：<b>${fmt(val)}</b>　｜　正確答案：約 <b>${fmt(target)}</b><br/>
+           <span style="color:var(--muted);font-weight:900">-5 秒｜Combo 歸零</span>`
+        );
+      }
+
+      updateHUD();
+
+      setTimeout(()=>{
+        if(!running) return;
+        allowSubmit = true;
+        newQuestion();
+      }, 650);
+    }
+
+    // ===== Pause =====
+    function setPaused(v){
+      if(!running) return;
+      paused = v;
+      if(paused){
+        pauseOverlay.classList.add("show");
+        pauseOverlay.setAttribute("aria-hidden","false");
+        btnPause.innerHTML = `<i class="fa-solid fa-play"></i> 繼續`;
+      }else{
+        pauseOverlay.classList.remove("show");
+        pauseOverlay.setAttribute("aria-hidden","true");
+        btnPause.innerHTML = `<i class="fa-solid fa-pause"></i> 暫停`;
+        ansInput.focus();
+      }
+    }
+
+    // ===== Menu selection handlers =====
+    function selectChip(group, chip, setter){
+      group.forEach(x=>x.classList.remove("active"));
+      chip.classList.add("active");
+      setter(chip.dataset);
+      refreshMenuUI();
+    }
+
+    // ===== Buttons =====
+    btnNameGo.addEventListener("click", ()=>{
+      const n = nameInput.value.trim();
+      if(!n){
+        nameInput.focus();
+        nameInput.style.borderColor = "rgba(220,38,38,.55)";
+        nameInput.style.boxShadow = "0 0 0 4px rgba(220,38,38,.12)";
+        setTimeout(()=>{ nameInput.style.borderColor=""; nameInput.style.boxShadow=""; }, 600);
+        return;
+      }
+      playerName = n;
+      setWho();
+      showScreen("menu");
+      refreshMenuUI();
+    });
+
+    levelChips.forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        selectChip(levelChips, ch, (ds)=> selectedLevel = Number(ds.level));
+      });
+    });
+
+    diffChips.forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        selectChip(diffChips, ch, (ds)=> selectedDiff = ds.diff);
+      });
+    });
+
+    speedChips.forEach(ch=>{
+      ch.addEventListener("click", ()=>{
+        selectChip(speedChips, ch, (ds)=> selectedSpeed = ds.speed);
+      });
+    });
+
+    btnStart.addEventListener("click", ()=>{
+      if(!playerName) return;
+      startGame();
+    });
+
+    btnClearLB.addEventListener("click", ()=>{
+      if(!(selectedLevel && selectedDiff && selectedSpeed)){
+        menuHint.classList.add("pop");
+        menuHint.innerHTML = `<b>清空前：</b>先選好「關卡 × 難度 × 速度」，不然我不知道你要清哪個宇宙的榜。`;
+        setTimeout(()=>menuHint.classList.remove("pop"), 180);
+        return;
+      }
+      localStorage.removeItem(lbKey(selectedLevel, selectedDiff, selectedSpeed));
+      renderMenuLB();
+    });
+
+    btnRestart.addEventListener("click", ()=>{
+      if(!running) return;
+      resetRunState();
+      newQuestion();
+    });
+
+    btnPause.addEventListener("click", ()=>{
+      if(!running) return;
+      setPaused(!paused);
+    });
+
+    btnBackMenu.addEventListener("click", ()=>{
+      if(!running) return;
+      running = false;
+      paused = false;
+      if(tickHandle) clearInterval(tickHandle);
+      showScreen("menu");
+      refreshMenuUI();
+    });
+
+    btnOverlayClose.addEventListener("click", ()=> setPaused(false));
+    btnOverlayResume.addEventListener("click", ()=> setPaused(false));
+    btnOverlayMenu.addEventListener("click", ()=>{
+      setPaused(false);
+      running = false;
+      if(tickHandle) clearInterval(tickHandle);
+      showScreen("menu");
+      refreshMenuUI();
+    });
+
+    btnSubmit.addEventListener("click", onSubmit);
+    ansInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") onSubmit();
+    });
+
+    btnResultMenu.addEventListener("click", ()=>{
+      showScreen("menu");
+      refreshMenuUI();
+    });
+
+    btnResultAgain.addEventListener("click", ()=> startGame());
+
+    // Slider interactions
+    slider.addEventListener("input", ()=>{
+      updateMeter();
+      draw();
+    });
+
+    function updateMeter(){
+      if(selectedLevel === 2){
+        vizAngle = Number(slider.value);
+        meterText.innerHTML = `中心角 <b>${vizAngle}°</b>（可推拉）`;
+      }else{
+        const r = Math.max(2, Math.round(Number(slider.value)/6));
+        vizRadius = r;
+        meterText.innerHTML = `半徑 r ≈ <b>${vizRadius} cm</b>（推拉量測）`;
+      }
+    }
+
+    // Keyboard shortcuts
+    window.addEventListener("keydown", (e)=>{
+      if(e.code === "Space"){
+        if(running){
+          e.preventDefault();
+          setPaused(!paused);
+        }
+      }
+      if((e.key === "r" || e.key === "R") && running){
+        e.preventDefault();
+        resetRunState();
+        newQuestion();
+      }
+    });
+
+    // ===== Drawing =====
+    function clear(){ ctx.clearRect(0,0,viz.width,viz.height); }
+
+    function draw(){
+      clear();
+      if(vizMode === "circle") drawCircleMode();
+      else if(vizMode === "sector") drawSectorMode();
+      else drawAppMode();
+    }
+
+    function drawBackground(){
+      ctx.save();
+      ctx.globalAlpha = 0.65;
+      ctx.strokeStyle = "rgba(100,116,139,.18)";
+      ctx.lineWidth = 1;
+      const step = 40;
+      for(let x=0;x<=viz.width;x+=step){
+        ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,viz.height); ctx.stroke();
+      }
+      for(let y=0;y<=viz.height;y+=step){
+        ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(viz.width,y); ctx.stroke();
+      }
+      ctx.restore();
+
+      const g = ctx.createRadialGradient(260,180,40, 260,180,420);
+      g.addColorStop(0,"rgba(95,115,255,.14)");
+      g.addColorStop(0.55,"rgba(247,179,194,.10)");
+      g.addColorStop(1,"rgba(255,255,255,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,viz.width,viz.height);
+    }
+
+    function drawCircleMode(){
+      drawBackground();
+      const cx = viz.width*0.50;
+      const cy = viz.height*0.50 + 10;
+      const rpx = vizRadius * 12;
+      const R = clamp(rpx, 36, 210);
+
+      ctx.save();
+      ctx.fillStyle = "rgba(95,115,255,.12)";
+      ctx.strokeStyle = "rgba(95,115,255,.70)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(cx,cy,R,0,Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      const slices = vizParts;
+      ctx.save();
+      ctx.strokeStyle = "rgba(15,23,42,.12)";
+      ctx.lineWidth = 2;
+      for(let i=0;i<slices;i++){
+        const a = (Math.PI*2) * (i/slices);
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx + Math.cos(a)*R, cy + Math.sin(a)*R);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,215,0,.95)";
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.lineTo(cx + R, cy);
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,215,0,.95)";
+      ctx.beginPath();
+      ctx.arc(cx + R, cy, 10, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+
+      drawLabel(`半徑 r`, cx + R*0.55, cy - 18, "rgba(255,215,0,.95)");
+      drawLabel(`平方單位`, cx - R*0.8, cy + R*0.72, "rgba(100,116,139,.95)");
+    }
+
+    function drawSectorMode(){
+      drawBackground();
+      const cx = viz.width*0.50;
+      const cy = viz.height*0.52 + 10;
+      const rpx = vizRadius * 11;
+      const R = clamp(rpx, 50, 220);
+
+      const angle = clamp(vizAngle, 1, 359);
+      const a0 = -Math.PI/2;
+      const a1 = a0 + (angle * Math.PI / 180);
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(100,116,139,.20)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(cx,cy,R,0,Math.PI*2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.fillStyle = "rgba(247,179,194,.18)";
+      ctx.strokeStyle = "rgba(247,179,194,.90)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,R,a0,a1,false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,215,0,.95)";
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(cx,cy); ctx.lineTo(cx + Math.cos(a0)*R, cy + Math.sin(a0)*R); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx,cy); ctx.lineTo(cx + Math.cos(a1)*R, cy + Math.sin(a1)*R); ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.strokeStyle = "rgba(95,115,255,.85)";
+      ctx.lineWidth = 6;
+      ctx.lineCap = "round";
+      const arcR = Math.max(38, R*0.32);
+      ctx.beginPath();
+      ctx.arc(cx,cy,arcR,a0,a1,false);
+      ctx.stroke();
+      ctx.restore();
+
+      drawLabel(`中心角 θ = ${angle}°`, cx, cy - arcR - 16, "rgba(95,115,255,.95)");
+      drawLabel(`半徑 r`, cx + R*0.4, cy + 14, "rgba(255,215,0,.95)");
+      drawLabel(`比例 θ/360`, cx - R*0.88, cy + R*0.70, "rgba(100,116,139,.95)");
+    }
+
+    function drawAppMode(){
+      drawBackground();
+      const cx = viz.width*0.50;
+      const cy = viz.height*0.52 + 10;
+      const rpx = vizRadius * 11;
+      const R = clamp(rpx, 60, 220);
+
+      ctx.save();
+      ctx.fillStyle = "rgba(95,115,255,.10)";
+      ctx.strokeStyle = "rgba(95,115,255,.60)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(cx,cy,R,0,Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      const angle = clamp(vizAngle, 1, 359);
+      const a0 = -Math.PI/2;
+      const a1 = a0 + (angle * Math.PI / 180);
+      ctx.save();
+      ctx.fillStyle = "rgba(255,215,0,.18)";
+      ctx.strokeStyle = "rgba(255,215,0,.85)";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,R,a0,a1,false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+
+      if(appVariant === 1){
+        const slices = vizParts;
+        ctx.save();
+        ctx.strokeStyle = "rgba(15,23,42,.10)";
+        ctx.lineWidth = 2;
+        for(let i=0;i<slices;i++){
+          const a = (Math.PI*2) * (i/slices) - Math.PI/2;
+          ctx.beginPath();
+          ctx.moveTo(cx,cy);
+          ctx.lineTo(cx + Math.cos(a)*R, cy + Math.sin(a)*R);
+          ctx.stroke();
+        }
+        ctx.restore();
+        drawLabel(`等分：${vizParts} 格`, cx, cy + R + 26, "rgba(100,116,139,.95)");
+      }else if(appVariant === 2){
+        drawLabel(`剪下 θ = ${angle}°`, cx, cy + R + 26, "rgba(100,116,139,.95)");
+      }else{
+        drawLabel(`拼接扇形`, cx, cy + R + 26, "rgba(100,116,139,.95)");
+      }
+    }
+
+    function drawLabel(text, x, y, color){
+      ctx.save();
+      ctx.font = "900 18px 'Noto Sans TC','Plus Jakarta Sans',sans-serif";
+      ctx.fillStyle = color || "rgba(15,23,42,.85)";
+      ctx.textAlign = "center";
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    // ===== Scene SVG renderers =====
+    function svgClear(){ while(sceneSvg.firstChild) sceneSvg.removeChild(sceneSvg.firstChild); }
+
+    function renderSceneCandy(r, n){
+      svgClear();
+      const W=900,H=380, cx=450, cy=190, R=140;
+
+      sceneSvg.appendChild(el("rect",{x:0,y:0,width:W,height:H,rx:24,fill:"rgba(255,255,255,0)"}));
+      sceneSvg.appendChild(el("circle",{cx,cy,r:R+26,fill:"rgba(95,115,255,.08)"}));
+
+      const start = -90;
+      for(let i=0;i<n;i++){
+        const a0 = (start + i*(360/n)) * Math.PI/180;
+        const a1 = (start + (i+1)*(360/n)) * Math.PI/180;
+        const p = sectorPath(cx,cy,R,a0,a1);
+        sceneSvg.appendChild(el("path",{d:p, fill: i%2? "rgba(247,179,194,.24)":"rgba(255,215,0,.22)", stroke:"rgba(15,23,42,.10)", "stroke-width":2}));
+      }
+
+      sceneSvg.appendChild(el("circle",{cx,cy,r:R,fill:"none",stroke:"rgba(95,115,255,.55)","stroke-width":6}));
+      sceneSvg.appendChild(el("text",{x:60,y:70,fill:"rgba(15,23,42,.85)","font-size":28,"font-weight":900}, `半徑 r = ${r} cm`));
+      sceneSvg.appendChild(el("text",{x:60,y:110,fill:"rgba(100,116,139,.95)","font-size":22,"font-weight":900}, `等分 ${n} 格（每格面積相同）`));
+
+      for(let k=0;k<10;k++){
+        const x = rnd(560,820), y=rnd(70,320);
+        sceneSvg.appendChild(el("circle",{cx:x,cy:y,r:rnd(10,16),fill: k%2? "rgba(255,215,0,.55)":"rgba(247,179,194,.55)", stroke:"rgba(15,23,42,.12)","stroke-width":2}));
+      }
+    }
+
+    function renderScenePaper(r, angle){
+      svgClear();
+      const W=900,H=380, cx=360, cy=200, R=140;
+
+      sceneSvg.appendChild(el("circle",{cx,cy,r:R+26,fill:"rgba(247,179,194,.10)"}));
+      sceneSvg.appendChild(el("circle",{cx,cy,r:R,fill:"rgba(95,115,255,.10)",stroke:"rgba(95,115,255,.55)","stroke-width":6}));
+
+      const start=-90;
+      const a0 = start*Math.PI/180;
+      const a1 = (start + angle)*Math.PI/180;
+      const p = sectorPath(cx,cy,R,a0,a1);
+      sceneSvg.appendChild(el("path",{d:p, fill:"rgba(255,215,0,.28)", stroke:"rgba(255,215,0,.65)","stroke-width":5}));
+
+      sceneSvg.appendChild(el("path",{d:`M 520 205 C 590 175, 640 165, 710 150`, stroke:"rgba(100,116,139,.65)","stroke-width":6, fill:"none", "stroke-linecap":"round"}));
+      sceneSvg.appendChild(el("path",{d:`M 700 142 L 735 150 L 708 170 Z`, fill:"rgba(100,116,139,.65)"}));
+
+      const cx2=740, cy2=230, R2=120;
+      const p2 = sectorPath(cx2,cy2,R2, (-Math.PI/2), (-Math.PI/2)+angle*Math.PI/180 );
+      sceneSvg.appendChild(el("path",{d:p2, fill:"rgba(255,215,0,.22)", stroke:"rgba(255,215,0,.65)","stroke-width":6}));
+      sceneSvg.appendChild(el("circle",{cx:cx2,cy:cy2,r:6,fill:"rgba(15,23,42,.35)"}));
+
+      sceneSvg.appendChild(el("text",{x:60,y:70,fill:"rgba(15,23,42,.85)","font-size":28,"font-weight":900}, `半徑 r = ${r} cm`));
+      sceneSvg.appendChild(el("text",{x:60,y:110,fill:"rgba(100,116,139,.95)","font-size":22,"font-weight":900}, `剪下中心角 θ = ${angle}°（求剩下的面積）`));
+    }
+
+    function renderSceneSplit(r, a, b){
+      svgClear();
+      const W=900,H=380, cx=450, cy=200, R=150;
+
+      sceneSvg.appendChild(el("circle",{cx,cy,r:R+30,fill:"rgba(95,115,255,.08)"}));
+      sceneSvg.appendChild(el("circle",{cx,cy,r:R,fill:"rgba(255,255,255,.0)",stroke:"rgba(95,115,255,.55)","stroke-width":6}));
+
+      const start=-90;
+      const p1 = sectorPath(cx,cy,R, start*Math.PI/180, (start+a)*Math.PI/180);
+      sceneSvg.appendChild(el("path",{d:p1, fill:"rgba(247,179,194,.26)", stroke:"rgba(247,179,194,.65)","stroke-width":6}));
+      const p2 = sectorPath(cx,cy,R, (start+a+20)*Math.PI/180, (start+a+20+b)*Math.PI/180);
+      sceneSvg.appendChild(el("path",{d:p2, fill:"rgba(255,215,0,.22)", stroke:"rgba(255,215,0,.65)","stroke-width":6}));
+
+      sceneSvg.appendChild(el("text",{x:60,y:70,fill:"rgba(15,23,42,.85)","font-size":28,"font-weight":900}, `半徑 r = ${r} cm`));
+      sceneSvg.appendChild(el("text",{x:60,y:110,fill:"rgba(100,116,139,.95)","font-size":22,"font-weight":900}, `兩塊扇形：${a}° 與 ${b}°（求總面積）`));
+
+      for(let i=0;i<10;i++){
+        const x=rnd(650,860), y=rnd(70,320);
+        sceneSvg.appendChild(el("circle",{cx:x,cy:y,r:rnd(4,7),fill:"rgba(95,115,255,.55)"}));
+      }
+    }
+
+    function sectorPath(cx,cy,R,a0,a1){
+      const x0 = cx + Math.cos(a0)*R;
+      const y0 = cy + Math.sin(a0)*R;
+      const x1 = cx + Math.cos(a1)*R;
+      const y1 = cy + Math.sin(a1)*R;
+      const large = (a1 - a0) > Math.PI ? 1 : 0;
+      return `M ${cx} ${cy} L ${x0} ${y0} A ${R} ${R} 0 ${large} 1 ${x1} ${y1} Z`;
+    }
+
+    function el(tag, attrs={}, text=null){
+      const n = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      Object.entries(attrs).forEach(([k,v])=> n.setAttribute(k, String(v)));
+      if(text!==null) n.textContent = text;
+      return n;
+    }
+
+    // ===== Init =====
+    function init(){
+      setWho();
+      meterText.textContent = "—";
+      updateMeter();
+      draw();
+      refreshMenuUI();
+    }
+    init();
+  </script>
+</body>
+</html>
